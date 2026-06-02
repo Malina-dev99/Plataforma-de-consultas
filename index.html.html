@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Consultas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            color: #124187;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+
+        /* Header */
+        .header {
+            background: #124187;
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 20px rgba(18, 65, 135, 0.15);
+        }
+
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+        }
+
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 300;
+            transition: opacity 0.3s ease;
+        }
+
+
+        .nav-link:hover {
+            opacity: 0.8;
+        }
+
+
+        /* Main Content */
+        .main {
+            padding: 4rem 0;
+        }
+
+
+        .hero {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+
+        /* Spheres Grid */
+        .spheres-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            padding: 2rem 0;
+        }
+
+
+        .sphere {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(18, 65, 135, 0.1);
+        }
+
+
+        .sphere:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(218, 30, 40, 0.4);
+        }
+
+
+        .sphere.primary,
+        .sphere.secondary,
+        .sphere.outline {
+            background: linear-gradient(135deg, #124187, #1a5bb8);
+            color: white;
+            box-shadow: 0 10px 30px rgba(218, 30, 40, 0.2);
+        }
+
+
+        .sphere-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+
+        .sphere-title {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+
+        .sphere-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+
+        /* Active State */
+        .sphere.active {
+            transform: scale(1.1);
+            box-shadow: 0 25px 50px rgba(218, 30, 40, 0.5);
+        }
+
+
+        .sphere.active.primary,
+        .sphere.active.secondary,
+        .sphere.active.outline {
+            background: linear-gradient(135deg, #124187, #1a5bb8);
+            box-shadow: 0 25px 50px rgba(218, 30, 40, 0.6);
+        }
+
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+           
+            .spheres-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+           
+            .sphere {
+                width: 150px;
+                height: 150px;
+            }
+           
+            .sphere-icon {
+                font-size: 2rem;
+            }
+        }
+
+
+        @media (max-width: 480px) {
+            .spheres-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(18, 65, 135, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.8);
+            animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+
+        .modal-icon {
+            font-size: 3rem;
+            margin-right: 1rem;
+        }
+
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 300;
+            color: #124187;
+            margin: 0;
+        }
+
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #124187;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            transform: rotate(90deg);
+        }
+
+
+        .modal-body {
+            color: #124187;
+            line-height: 1.8;
+        }
+
+
+        .modal-body h3 {
+            color: #DA1E28;
+            margin: 1.5rem 0 1rem 0;
+            font-weight: 500;
+        }
+
+
+        .modal-body ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+
+        .modal-body li {
+            margin: 0.5rem 0;
+        }
+
+
+        .contact-btn {
+            background: linear-gradient(135deg, #124187, #1a5bb8);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            width: 100%;
+        }
+
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(18, 65, 135, 0.3);
+        }
+
+
+        .contact-btn.secondary {
+            background: linear-gradient(135deg, #DA1E28, #ff3c47);
+        }
+
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+
+        @keyframes modalSlideIn {
+            from {
+                transform: scale(0.8) translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+
+        /* Footer */
+        .footer {
+            background: #124187;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+
+        .footer p {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <div class="logo">Consultas</div>
+                <div class="nav-menu">
+                    <a href="#" class="nav-link">Inicio</a>
+                    <a href="#" class="nav-link">Contacto oficina Madrid</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+
+    <main class="main">
+        <div class="container">
+            <section class="hero">
+                <h1>Plataforma de apoyo</h1>
+                <p>Selecciona el área en el que tengas dudas</p>
+            </section>
+
+
+            <section class="spheres-container">
+                <div class="sphere primary" onclick="selectSphere(this, 'E-term')">
+   
+                    <div class="sphere-title">E-term</div>
+                    <div class="sphere-subtitle">GDS</div>
+                </div>
+
+
+                <div class="sphere secondary" onclick="selectSphere(this, 'Aeropuerto')">
+               
+                    <div class="sphere-title">Aeropuerto</div>
+                    <div class="sphere-subtitle">MAD/BCN- T1</div>
+                </div>
+
+
+                <div class="sphere outline" onclick="selectSphere(this, 'Emitir un billete')">
+         
+                    <div class="sphere-title">Emitir un billete</div>
+                    <div class="sphere-subtitle">Airchina.es</div>
+                </div>
+
+
+                <div class="sphere primary" onclick="selectSphere(this, 'Oficinas Air China')">
+                    <div class="sphere-icon"></div>
+                    <div class="sphere-title">Contactos</div>
+                    <div class="sphere-subtitle"></div>
+                </div>
+
+
+                <div class="sphere outline" onclick="selectSphere(this, 'agencias')">
+                   
+                    <div class="sphere-title">Agencias</div>
+                 
+                </div>
+
+
+                <div class="sphere secondary" onclick="selectSphere(this, 'particulares')">
+               
+                    <div class="sphere-title">Particulares</div>
+                    <div class="sphere-subtitle">Pasajeros</div>
+                </div>
+
+
+                <div class="sphere primary" onclick="selectSphere(this, 'grupos')">
+           
+                    <div class="sphere-title">Grupos</div>
+                    <div class="sphere-subtitle">grupos@airchina.es</div>
+                </div>
+
+
+                <div class="sphere outline" onclick="selectSphere(this, 'equipaje incluido')">
+                 
+                    <div class="sphere-title">Equipaje</div>
+                 
+                </div>
+            </section>
+        </div>
+    </main>
+
+
+    <!-- Modal -->
+    <div class="modal" id="consultaModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <div class="modal-icon" id="modalIcon">⚖️</div>
+                <h2 class="modal-title" id="modalTitle">Consulta Legal</h2>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- El contenido se cargará dinámicamente -->
+            </div>
+            <button class="contact-btn" id="contactBtn" onclick="startConsultation()">
+                Iniciar Consulta
+            </button>
+        </div>
+    </div>
+
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Plataforma de Consultas. Primera creación sólida de Marina Prieto Oltra.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        // Contenido detallado para cada consulta
+        const consultaData = {
+            "E-term": {
+                title: 'E-term',
+                content: `
+                    <h3>Ocupación de vuelo</h3>
+                    <p>flP:k/ca908/21oct</p><p>flp:k/ca907/15oct25/30oct25/99 fechas concretas</p>
+
+
+                    <h3>Frecuencia de vuelos</h3>
+                    <p>skmadgru/13MAR/CA</p>
+                   
+                    <h3>Menor no acompañado</h3>
+                    <p>SSR UMNR CA HK1 GRUMAD 898 W12AUG UM13/P1</p>
+                    <p><strong>Revisar disponibilidad</strong> MLU1/CA908/20nov-  el número que aparece es el total de servicios solicitados</p>  
+
+
+                    <h3>Servicios y menús especiales</h3>
+                    <p>BSCT- cuna</p><p>WCHS- silla de ruedas, asistencia</p>STPC - stopover</p>
+
+
+                    <h3>Ver tarifa oculta (IT)</h3>
+                    <p>dfsq:ex/999-3483184018</p>
+
+
+                    <h3>Añadir mascotas</h3>
+                    <p>SSR AVIH CA NN1 MADPEK 908 H26JUN/ DOG 8KGS/P1</p>
+
+
+                    <h3>Firma remisión</h3>
+                    <p>ssr oths 1a mad001</p>
+
+
+                     <h3>Hotel de tránsito</h3>
+                     <p>SSR STPC CA NN1 madpek 898q15feb THCA/CA959w16feb16/p2</p>
+
+
+                     <h3>Recuperar el control del billete</h3>
+                    <p><strong>ETKT DISALLOWED - NEED AIRLINE R/LOC-RETRY</strong></p>  
+                    <p>1---detr:tn/9995438703533, cn PNR</p>
+                    <p>2---etie:9995438703533/1a-lh</p>
+                    <p>3---detr:tn/999 5438703533,cn PNR,dlh</p>
+                    <p>4--detr:c1</p>
+
+
+                    <h3>Cotizar niño</h3>
+                    <p>qte:/ch/ca</p>
+
+
+                    <h3>Condiciones billete</h3>
+                    <ol>
+                        <li>xsfsdmad.../fecha de emision*fecha de viaje/ca/clase*</li>
+                        <li>xsfsn numero de la condición//16 (cambio y cancelación)</li>
+                        <li>xsfsnpn, xsfsnpb</li>
+                    </ol>
+
+
+                    <h3>Lista de espera</h3>
+                    <p>comprobamos disponibilidad: avmadpek/fecha/ca</p>
+                    <p>sd1 (numero de tramo) v (clase)/ll2 (número de pax)</p>
+
+
+                    <h3>Eliminar línea de una reserva</h3>
+                    <ol>
+                        <li>rt pnr</li>
+                        <li>xe1 (número de línea)</li>
+                        <li>@ki</li>
+                    </ol>
+
+
+                    <h3>Añadir tarjeta de viajero frecuente</h3>
+                   <p>SSR FQTV CA HK/ XX NNNNNNNN/PN </p>
+                   <p> <strong>EJEMPLO:</strong> SSR FQTV CA HK/ TP384444804/P1</p>
+
+
+                   <h3>Cancelar PNR</h3>
+                    <p>xepnr@</p>
+
+
+                   
+                   <h3>OD</h3>
+                   <p>Si elegimos una alternativa de OD y nos sale como HN podemos elegir esa misma ruta por tramo y nos confirmará en HK después de unos minutos</p>
+                 
+
+
+
+
+                `,
+             
+            },
+            Aeropuerto: {
+       
+                title: 'madapca@airchina.es',
+                content: `
+                   
+                    <h3>Silla de ruedas</h3>
+                    <p>Introducir en el sistema: 13.SSR <strong>WCHS</strong> CA NN1 MADHAV 865 P05JUL/P1</p>                                        
+                    <p>Los pasajeros con movilidad limitada debido a enfermedad, salud, vejez o fractura ósea en una extremidad inferior que necesiten viajar con una silla de ruedas eléctrica pueden facturar su silla de ruedas eléctrica como equipaje.
+                    Las sillas de ruedas eléctricas no están permitidas en la cabina del avión, por lo que estas deben ser facturadas en los mostradores de facturación. El pasajero afectado deberá acudir a los mostradores de facturación del aeropuerto con una antelación mínima de 2 horas antes de la hora límite para la facturación.
+                    Las sillas de ruedas eléctricas no contabilizan en la franquicia de equipaje y se puede transportar de forma gratuita. Sin embargo, sólo se puede facturar una de unidad de este tipo de silla de ruedas.
+                    Limitaciones sobre la capacidad máxima de las baterías de litio de las sillas de ruedas eléctricas
+                    Si la silla de ruedas eléctrica está alimentada por una batería de litio, la capacidad de la batería no puede exceder los 300Wh. Si la silla de ruedas está alimentada por dos baterías de litio, la capacidad de cada batería no puede exceder los 160Wh. Adicionalmente, el pasajero también podrá llevar una batería de litio de reserva de capacidad no superior a 300 Wh o dos baterías de litio de reserva con una capacidad cada una no superior a 160Wh.
+                    El pasajero puede llevar las baterías/baterías de litio en el equipaje de mano.<p>
+                    <h3>Baterías</h3>
+                    <p>La batería debe ir siempre como equipaje de mano, nunca facturada.</p>
+                    <p>Cualquier batería de litio con una capacidad superior a los límites superiores especificados no será aceptada para su transporte.</p><p>Estación de Energía Portátil EcoFlow DELTA 2 con capacidad ampliable de 1 a 3 kWh, batería LFP, carga rápida, uso como generador solar para alimentación de reserva en casa, camping y autocaravanas  NO PUEDEN TRANSPORTARSE POR SER CORROSIVAS
+                    </p><p>El dron y las baterías deben llevarse como equipaje de mano. No se pueden facturar, ya que está prohibido. <p>En cuanto a la limitación de las baterías:
+                     <ul>
+                        <li>Baterías de litio con menos de 100Wh: Máximo 8 unidades.</li>
+                        <li>Baterías de litio entre 100Wh y 160Wh: Máximo 2 unidades.</li>
+                    </ul></p>
+                    <h3>Equipaje deportivo</h3>
+                    <p>GOLF. Los palos de golf están dentro de la reglamentación como equipaje general. No tiene que pagar suplemento por ser palos de golf.</p>
+                    <p>BICICLETAS. Si la bicicleta no supera los 23 kg puede ir como equipaje facturado.</p>  
+                    <p>No hace falta indicar nada en la reserva, viaja como una maleta más.
+                    El unico tratamiento especial que tiene es que una vez facturado se enviara por una cinta especial donde sufre menos golpes.
+                    Las bicicletas deben ir debidamente protegidas contra impactos en cajas y con las ruedas deshinchadas.</p>
+                    <p>Las bicicletas entran dentro de la franquicia que se le permita a cada pasajero. Han de calcular 140€ por cada pieza que exceda de esa franquicia.
+                    El peso permitido es de 23kg por bulto, si se excede hasta 28kg, el cargo es de 35€, si se excede más de 28kg (hasta un máximo permitido de 32kg por pieza),
+                    el precio es de 85€ por pieza.</p>
+                                           
+                `,
+                buttonClass: 'secondary'
+            },
+            "Emitir un billete": {
+           
+                title: 'Airchina.es',
+                content: `
+                    <h3>Pasos a seguir</h3>
+                    <p>1. avmadpek/30apr/ca</p>
+                    <p>2. sd1y1</p>
+                    <p>3. rt <strong>Revisamos</strong></p>
+                    <p>4. qte:/ca <strong>Cotizamos</strong></p>
+                    <p>5. dfsq:a </p>
+                    <p>7. xsfsq2 <strong>Cargamos tarifa</strong></p>  
+                    <p>8. nm1/apellidos/nombre 1apellidos/nombre <strong>En caso de que haya más de 1 pasajero</strong></p>
+                    <p>9. osi ca ctcc 0034915489032</p>
+                    <p>10. ct: contacto <strong>Teléfono de contacto del pasajero</strong></p>
+                    <p>11. ssr docs ca hk1 p//es// pasaporte/es/f.nacimiento/sexo/f.caducidad/apellido/nombre/p1</p>
+                    <p>12. @ki</p>
+                    <p>13. tkt- di:7- ec7- ti7  <strong>Activar impresora</strong></p>
+                    <p>14. tktv:7</p>
+                    <p>15. ETDZ:7</p>
+
+
+                    <p>*Si queremos poner fecha de caducidad de la reserva: tl/1200/04dec/mad001</p>
+                   
+                   
+           
+                `,
+                buttonClass: 'primary'
+            },
+            "Oficinas Air China": {
+           
+                title: 'Contactos',
+                content: `
+                    <h3>Reclamaciones</h3>
+                    <p>mad4@airchina.es</p>
+
+
+                    <h3>BCN</h3>
+                    <p>comercialbarcelona@airchina.es</p>
+
+
+                    <h3>Phoenix Miles</h3>
+                    <p>ffp@airchina.es</p>
+
+
+                    <h3>Call Center</h3>
+                    <p>ca-europe@airchina.com // 800000099</p> <p>CALL CENTER GLOBAL: 95583</p>
+
+
+                    <h3>Aeropuerto</h3>
+                    <p>MAD: madapca@airchina.es // 913010215</p>
+                    <p>BCN: bcnapca@airchina.es // 931190193</p>
+
+
+                    <h3>Grupos</h3>
+                    </p>grupos@airchina.es<p>
+
+
+                    <h3>Envío por cargo</h3>
+                    <p>910 375 936</p>
+                    <p>mad.sales@airchinacargo.com</p>
+                   
+
+
+                    <h3>Oficina México</h3>
+                    <p>william.pan@airchina.us</p>
+
+
+                    <h3>Oficina Sydney</h3>
+                    <p>sydxc@airchina.com</p>
+
+
+                    <h3>China offices</h3>
+                    <p>Beijing</p><p>TELÉFONO: +86-10-95583</p><p>Shanghai</p><p>TELÉFONO: 95583</p>
+                   
+                    <h3>Américas</h3>
+                    <p>Beijing</p><p>TELÉFONO: +86-10-95583</p><p>Shanghai</p><p>TELÉFONO: 95583</p><p>Nueva York</p><p>EMAIL: nyc3@airchina.com</p><p>San Francisco</p><p>EMAIL: sfsales@airchina.us</p>
+                   
+                    <h3>Europa</h3>
+                    <p>EMAIL: sfsales@airchina.us</p><p>Frankfurt</p> <p>EMAIL: cafrastation@outlook.com, TELEFONO: +49-69-69052141</p><p>Londres</p><p>EMAIL: LHR@AIRCHINA.COM, TELEFONO: +44-20-87454624</p>
+
+
+                    <h3>contacto de china airlines</h3>
+                    <p>info.nl@china-airlines.com</p>
+
+
+
+
+                   
+                `,
+                buttonClass: 'primary'
+            },
+            agencias: {
+               
+                title: 'Apoyo a agencias',
+                content: `
+                    <h3>Clases</h3>
+                    <table>
+                    <tr>TARIFAS</tr>
+                        <th>BUSINESS:</th>
+                        <th>J C D Z R I</th>
+                    </tr>
+                    <tr>
+                        <th>PREMIUM:</th>
+                        <th>G E</th>
+                    </tr>
+                    <tr>
+                        <th>ECONOMY:</th>
+                        <th>Y B M U H Q V W S T L P X N* L</th>
+                    </table>
+                    <p><strong> *N: empleados</strong></p>
+                    <p>A: asientos disponibles; L: no asientos disponibles, lista de espera abierta; C: clase cerrada o disponibilidad no disponible</p>  
+                     
+                    <h3>Endoso</h3>
+                    <p>INVL CHG DUE TO CA... CHGED</p><p>INVL CHG DUE TO CA... CNLD</p>
+
+
+                    <h3>Maletas a destino</h3>
+                    <p>El equipaje se factura hasta el destino final siempre que todos los vuelos estén operados por la misma aerolínea.</p><p>Si hay cambio de aerolínea el pasajero debe recoger sus maletas y volver a facturarlas en el mostrador que se indique en las pantallas.</p>
+                    <p>Vuelos incluidos SC2202, SC2206</p>
+
+
+                    <h3>Cambio de nombre</h3>
+                    <p>Estimado colaborador, para hacer el cambio tienen que emitir nuevos billetes con el nombre correcto, los pasos a seguir son:</p>
+                        <ul>
+                        <li>Hacer una nueva reserva con el nombre correcto en la misma clase que el billete original.</li>
+                        <li>Si no hay plazas disponibles en la misma clase, ponerla en HL y enviarnos antiguo y nuevo PNR para que solicitemos la plaza a nuestra central.</li>
+                        <li>Una vez confirmada la plaza, emitir lo antes posible.</li>
+                        <li>Mandarnos el antiguo y nuevo número de billete para generar waiver code y reembolséis el billete original.</li>
+                    </ul> Un saludo, RMK: 经审核符合姓名变更规则</p>
+                    <p>您好， 名字错误,请换K。正确的预定: (correcto) 错误的预定: (erróneo) ---谢谢</p>
+
+
+
+
+                    <h3>Name change</h3>
+                    <p>Dear partner, In order to make the change the customer’s name you have to issue a new ticket with the correct name. As far as I see there are more than one passenger in the same PNR, so you will have to:
+                    <ul>
+                       <li>Split the wrong name passenger in a new PNR.</li>
+                        <li>Make a new booking with the correct name in the same class as the original ticket.</li>
+                       <li>If there are no seats available in the same class, place it in HL and send us the old and new PNR so that we can request the seat from our head office.</li>
+                        <li>Once the seat is confirmed by or head office, issue as soon as possible.</li>
+                        <li>Send us the old and new ticket number to create a waiver code so you can refund the original ticket.</li>
+                    </ul>
+                    Greetings, </p>
+
+
+                     <h3>Tarifa oculta</h3>
+                     <p>dfsq:ex/999-3483184018</p>
+
+
+                   
+
+
+                    <h3>Downgrade</h3>
+                    <p>No se puede autorizar cambio de fecha a coste 0, reembolso sí.Posteriormente se puede solicitar la compensación. </p>
+
+
+                    <h3>Tasa por cancelación/ cambio</h3>
+                    <p>Tasa OC </p>
+
+
+
+
+                    <h3>Tarifa inferior con clase E</h3>
+                    <p>Esto pasa porque E es una tarifa dinámica. En este caso, si la nueva tarifa es superior tienen que pagar la diferencia, si es inferior mantener la anterior y añadir la tasa de penalización. </p>
+
+
+                     <h3>Datos bancarios Air China</h3>
+                    <p>Datos bancarios Air China: </p>
+                    </p>Titular de cuenta: AIR CHINA LIMITED, SUCURSAL EN ESPAÑA
+
+
+                    <p>IBAN: ES13 0049 0356 51  2710597800</p>
+                     <p>Banco: BANCO SANTANDER S.A </p>
+                     <p>SWIFT CODE:  BSCHESMM </p>
+                      <p>NIF: W-7201046E </p>
+
+
+
+
+                     <p>Para Factura </p>
+                     <p>AIR CHINA LIMITED, SUCURSAL EN ESPAÑA </p>
+                     <p>NIF: W-7201046E </p>
+                     </p>Gran Via 30, Planta 11, 28013, Madrid</p>
+
+
+                     <h3>ETKT NO SE PERMITE-SE REQUIERE R/LOC DE LINEA AEREA-REINTENTELO</h3>
+                     <p>Si a una agencia le aparece este mensaje y a nosotros no se nos abre el PNR, la solución es crear un nuevo PNR y hacer los cambios ahí</p>
+
+
+                     <h3>INSTRUMENTOS</h3>
+                     <p>Los instrumentos que ocupan asientos no llevan tasa CN. Es decir, se paga todas las tasas menos la CN, que son unos 20 euros.<p>
+
+
+                    <h3>Tiempo límite reserva</h3>
+                    <p>Si el es poco el tiempo límite de una reserva, puede ser porque quede poco para fecha de vuelo (menos de un año)</p>
+
+
+                    <h3>¿Se puede ampliar la fecha de caducidad de una reserva?</h3>
+                    <p>No, la que de el sistema</p>
+                   
+
+
+                `,
+                buttonClass: 'primary'
+            },
+            particulares: {
+             
+                title: 'Pasajeros',
+                content: `
+                    <h3>Reembolso incompleto</h3>
+                    <p></p>
+
+
+                    <h3>Reembolso por enfermedad</h3>
+                    <p> <ul>
+                        <li>Pedir  justificante al pasajero</li>
+                        <li>Revisar justificante</li>
+                        <li>Pedir firma a Óscar</li>
+                        <li>Pedirle al pasajero que rellene el online refund</li>
+                        <li>Mandar toda la documentación seguidamente (en un plazo de 5 días, pero lo antes posible) a este correo abrefund@airchina.com, y una breve explicación en chino de lo que le pasa al pasajero</li></ul>
+                        </p>
+
+
+                     <h3>Añadir bebé a reserva ya emitida</h3>
+                     <p>Call center</p>
+
+
+                     <h3>Medidas equipaje</h3>
+                     <p> <ul>
+                        <li>Piezas de equipaje facturado (Peso máximo: 23 kg)</li>
+                        <li>1 pieza de equipaje de mano (Medidas estandar. Peso máximo: 5 kg)</li>
+                        <li>1 accesorio personal (Se guarda debajo del asiento que tengas delante)</li>
+                   
+                            </p>
+                    <h3>Maletas extra</h3>
+                    <p>MAD-HAV/ HAV-MAD:</p>
+                    <p>1</p>
+
+
+                    <h3>Tránsito</h3>
+                    <p>Para pasajeros que viajan en Business existen salas de tránsito en Madrid y en Pekín que no necesitan reserva</p>
+                    <p>Para esperas de más de 6 horas que coincidan con la noche se puede reservar el hotel de tránsito en Pekín. Para escalas superiores a 4
+                        horas puede reservarse la sala de tránsito</p>  
+                   
+                    <h3>Transporte de mascotas</h3>
+                    <p> 1. Las mascotas viajan en bodega a excepción de perros guía. Debe facturar personalmente a su mascota en el aeropuerto nunca más tarde de los 120 minutos previos a la salida en el día de su vuelo.</p>
+                    <p> 2. Costo del traslado: entre 2 y 8 kg tiene un costo de <string> 600$</string>; entre 8 y 23kg tiene un costo de <string> 800$</string>; entre 23 y 32kg tiene un costo de <string> 1200$</string> *peso con jaula. Si sobre pasa los 32kg no se puede transportar en el avión de pasajeros y deberá ir como Cargo.</p>
+                    <p> 3. Para asegurar el espacio de la mascota en cabina o bodega  La reserva del servicio la puede hacer a través de este correo: ca-europe@airchina.com </p>
+                    <p> 4. Documentación necesaria para el transporte de mascotas: Al realizar la facturación de animales pequeños, debe aceptar y firmar una declaración de exención de responsabilidad en el reverso de la etiqueta de equipaje. Además de presentar todos los documentos en lo referido a vacunas y demás.
+                Si va a tomar un vuelo nacional, tiene que disponer de un certificado de cuarentena para su mascota, emitido por la Administración General de Supervisión de la Calidad, Inspección y Cuarentena (AQSIQ).  Si va a tomar un vuelo internacional o regional, además de facilitar un certificado de cuarentena
+                para su mascota emitido por la AQSIQ, también debe asegurarse de cumplir con los requisitos relacionados con el transporte de mascotas para los países a los que esté entrando o de los que esté saliendo, o en los que se encuentre en tránsito. </p>
+                    <p> 5. Razas no permitidas en vuelos por restricciones de la aerolínea. No se admiten para el transporte los gatos y perros de raza o cruces de naturaleza agresiva, que presenten el riesgo de causar daños a las personas, propensos a padecer dificultades respiratorias o de hocico chato, incluidos,
+                entre otros: Terriers (p. ej. Schnauzer), Boston Terrier, Boxers, Bulldogs y Spaniels、American Staffordshire terriers, American pitbull terriers, grifones de Bruselas, cocker spaniels ingleses, toy spaniels ingleses, spaniels</p>
+                   
+                    <h3>Factura</h3>
+                    <p>Estimado pasajero, Gracias por contactar con Air China.
+                    Hemos revisado su reserva. Le informamos de que, dado que nuestra sede fiscal está en China, no podemos emitir una factura de ese billete.
+                    En su lugar puede utilizar le recibo que nos adjunta.</p>
+                    Gracias por confiar en nosotros
+                    </p>
+                   
+                     <h3>Datos bancarios Air China</h3>
+                    <p>Datos bancarios Air China:</p>
+                    </p>Titular de cuenta: AIR CHINA LIMITED, SUCURSAL EN ESPAÑA
+
+
+                        IBAN: ES13 0049 0356 51  2710597800
+                        Banco: BANCO SANTANDER S.A
+
+
+                        SWIFT CODE:  BSCHESMM
+
+
+                        NIF: W-7201046E
+
+
+
+
+                        Para Factura
+                        AIR CHINA LIMITED, SUCURSAL EN ESPAÑA
+
+
+                        NIF: W-7201046E
+                        Gran Via 30, Planta 11, 28013, Madrid</p>
+
+
+                 <h3>Condiciones de tarifa. Normas de cancelación y reembolso</h3>
+                 <p>1. Regla general </p>
+                 <p>El boleto es no reembolsable en caso de cancelación o no-show (no presentarse al vuelo).</p>  
+                 <p>2. Si combinas tarifas reembolsables y no reembolsables</p>  
+                 <p>La parte reembolsable se puede devolver (menos la penalidad de cancelación, si aplica).
+
+
+                    La parte no reembolsable no se devuelve.
+
+
+                    Los cargos de combustible (YQ/YR) siguen las mismas reglas: si la tarifa es no reembolsable, tampoco se devuelve.</p>                                                                  
+
+
+                    <p> Cómo calcular el reembolso</p>
+
+
+                    <p>El reembolso tiene dos partes:</p>
+
+
+                    <p>Tarifa residual + YQ/YR (lo que sobra después de restar lo ya volado, lo no reembolsable y la penalidad). Impuestos residuales (los impuestos que no se usaron).Fórmula:
+Reembolso = (Tarifa total pagada + YQ/YR)
+            – (Tarifa de los vuelos ya realizados + YQ/YR de esos tramos)
+            – (Tarifa no reembolsable + YQ/YR)
+            – (Penalidad de cancelación)
+</p>
+<p>4. Si la tarifa residual es cero o negativa</p>
+
+
+<p>Solo se devuelven los impuestos no utilizados, excepto YQ/YR y el cargo OC (que es la penalidad de cambio).
+
+
+El cargo OC no es un impuesto del gobierno, es del boleto, y no se devuelve.</p>
+
+
+<p>5. Aplicación de penalidades</p>
+
+
+<p>Cada componente de tarifa tiene sus propias reglas de cancelación.
+
+
+Si combinas boletos con diferentes penalidades, se aplica la más alta.
+
+
+En reemisiones o cambios, la penalidad depende de la tarifa original que presentes para reembolso.</p>
+
+
+<p>6. Descuentos para niños e infantes</p>
+
+
+<p>Si el boleto es de niño con descuento, la penalidad también se aplica con descuento.
+
+
+Bebés sin asiento no pagan penalidad.
+
+
+Pero si el boleto es no reembolsable, tampoco se devuelve nada (incluyendo boletos de bebé sin asiento).</p>
+
+
+<p>7. Si la tarifa no reembolsable fue usada parcial o totalmente</p>
+
+
+<p>Se debe comparar el valor recalculado de lo que sí se voló contra el valor de la tarifa no reembolsable.
+
+
+Se toma el monto mayor como el “valor usado”.</p>
+
+
+<p>8. Recalcular tarifas de tramos volados</p>
+
+
+<p>Se usa la clase de reserva (booking class) que figura en el boleto.</p>
+
+
+Si no hay disponibilidad en esa clase, se usa la tarifa más baja disponible en una clase superior.
+
+
+<p>9. Una vez iniciado el viaje</p>
+
+
+<p>El cálculo de la tarifa residual + YQ/YR debe hacerse usando las tarifas e impuestos vigentes en la fecha original de emisión del boleto (no los actuales).</p>
+
+
+<p>10. Boletos reemitidos o intercambiados</p>
+
+
+<p>La parte no reembolsable del boleto original siempre se mantiene como no reembolsable, aunque se haya hecho un cambio o reemisión.</p>
+
+
+<p>11. Plazo para pedir reembolso</p>
+
+
+<p>El reembolso debe solicitarse dentro de la validez del boleto. </p>
+               
+                   
+                `,
+                buttonClass: 'secondary'
+            },
+            grupos: {
+             
+                title: 'grupos@airchina.es',
+                content: `
+                    <h3>El agente ha confirmado la cotización</h3>
+                    <p>代理已确认价格，麻烦帮忙确认 PNR 谢谢! </p>
+
+
+                    <h3>Ocupación para tarifa de grupo</h3>
+                    <p>flp:k/ca907/1oct/30oct  <strong> ocupación dentro de una franja temporal.</strong>
+                        Cuando la ocupación del día solicitado es de 120 o superior, no admite tarifa.</p>
+                   
+           
+                `,
+                buttonClass: 'primary'
+            },
+            "equipaje incluido": {
+               
+                title: 'Equipaje',
+                content: `
+                     
+                    <h3>Medidas equipaje</h3>
+                    <p> <ul>
+                        <li>Piezas de equipaje facturado (Peso máximo: 23 kg turista, 32kg business)</li>
+                        <li>1 pieza de equipaje de mano (Medidas estandar. Peso máximo: 5 kg)</li>
+                        <li>1 accesorio personal (Se guarda debajo del asiento que tengas delante)</li></p></ul>
+                       
+                     <h3>Equipaje de cabina</h3>
+                     <p>40x20x55</p>
+                     
+
+
+                    <h3>Maletas a destino</h3>
+                    <p>Las maletas llegan a destino final siempre que todos los vuelos sean con CA salvo Shanghai y Chengdu</p><p>Con los vuelos SC2202 y SC2206 llegan a destino</p>  
+                   
+                    <h3>Equipaje extra</h3>
+                    <p>MAD-HAV: 90, 120, 140 (euros)</p>
+                    <p>MAD-GRU: 220 (dólares)</p>  
+                    <p>MAD-PEK: 140 (euros), también en vuelos internos</p>
+
+
+
+
+                `,
+                buttonClass: 'primary'
+            }
+        };
+
+
+        function selectSphere(element, category) {
+            // Remove active class from all spheres
+            document.querySelectorAll('.sphere').forEach(sphere => {
+                sphere.classList.remove('active');
+            });
+           
+            // Add active class to selected sphere
+            element.classList.add('active');
+           
+            // Open modal with detailed information
+            openModal(category);
+        }
+
+
+        function openModal(category) {
+            const modal = document.getElementById('consultaModal');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const contactBtn = document.getElementById('contactBtn');
+           
+            const data = consultaData[category];
+           
+            modalIcon.textContent = data.icon;
+            modalTitle.textContent = data.title;
+            modalBody.innerHTML = data.content;
+           
+            // Set button style
+            contactBtn.className = `contact-btn ${data.buttonClass}`;
+           
+            // Store current category for consultation
+            modal.dataset.category = category;
+           
+            // Show modal
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent scroll
+        }
+
+
+        function closeModal() {
+            const modal = document.getElementById('consultaModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto'; // Restore scroll
+           
+            // Remove active state from spheres
+            document.querySelectorAll('.sphere').forEach(sphere => {
+                sphere.classList.remove('active');
+            });
+        }
+
+
+        function startConsultation() {
+            const modal = document.getElementById('consultaModal');
+            const category = modal.dataset.category;
+           
+            // Here you would typically redirect to a consultation form or booking system
+            alert(`Iniciando consulta de ${consultaData[category].title}.\n\nEn proceso, saludos.`);
+           
+            // Example: window.location.href = `/consulta/${category}`;
+           
+            closeModal();
+        }
+
+
+        // Close modal when clicking outside
+        document.getElementById('consultaModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+
+        // Add smooth scroll behavior
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+</body>
+</html>
+
